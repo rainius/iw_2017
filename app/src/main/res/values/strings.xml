@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">爱天气</string>
+    <string name="drawer_label">这里是抽屉</string>
 </resources>
