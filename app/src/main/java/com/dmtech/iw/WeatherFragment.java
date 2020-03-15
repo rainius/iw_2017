@@ -1,13 +1,18 @@
 package com.dmtech.iw;
 
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 
@@ -58,6 +63,11 @@ public class WeatherFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
 
+        TextView curTempView = view.findViewById(R.id.tv_cur_temp);
+        curTempView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+        TextView updateTimeView = view.findViewById(R.id.tv_update_time);
+        updateTimeView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+
         return view;
     }
 
@@ -65,4 +75,26 @@ public class WeatherFragment extends Fragment {
         return mName;
     }
 
+    // 获得虚拟按键栏的高度
+    private int getVirtualBarHeight(Context context) {
+        // 取得全屏高度值
+        WindowManager windowManager =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+        int height = dm.heightPixels;
+        // 如果系统版本大于5.0，则获取除虚拟栏之外的高度
+        // 系统版本如果在5.0之前，则不存在这个问题
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            display.getRealMetrics(dm);
+        }
+        int realHeight = dm.heightPixels;
+        // 二者相减得到虚拟栏高度
+        int virtualbarHeight = realHeight - height;
+        if (virtualbarHeight < 0) {
+            virtualbarHeight = 0;
+        }
+        return virtualbarHeight;
+    }
 }
