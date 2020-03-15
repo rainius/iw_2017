@@ -10,4 +10,6 @@
 
     <color name="colorWarning">#FF3D3D</color>
 
+    <color name="colorPanel">#30000000</color>
+
 </resources>
