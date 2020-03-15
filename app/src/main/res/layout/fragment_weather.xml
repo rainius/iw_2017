@@ -73,4 +73,26 @@
         app:layout_constraintBottom_toBottomOf="@+id/imageView8"
         app:layout_constraintStart_toEndOf="@+id/imageView8"
         app:layout_constraintTop_toTopOf="@+id/imageView8" />
+
+    <ImageView
+        android:id="@+id/iv_condition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/ic_w104"
+        app:layout_constraintBottom_toTopOf="@+id/tv_max_temp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_condition_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="多云"
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="@dimen/detail_info_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_condition"
+        app:layout_constraintStart_toEndOf="@+id/iv_condition"
+        app:layout_constraintTop_toTopOf="@+id/iv_condition" />
 </androidx.constraintlayout.widget.ConstraintLayout>
