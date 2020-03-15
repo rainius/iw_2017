@@ -117,4 +117,13 @@
         app:layout_constraintStart_toEndOf="@+id/iv_condition"
         app:layout_constraintTop_toTopOf="@+id/iv_condition" />
 
+    <View
+        android:id="@+id/view3"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@drawable/info_panel_border"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
