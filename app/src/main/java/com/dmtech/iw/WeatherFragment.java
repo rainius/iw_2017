@@ -57,8 +57,7 @@ public class WeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
-        TextView nameView = view.findViewById(R.id.tv_name);
-        nameView.setText(mName);
+
         return view;
     }
 
