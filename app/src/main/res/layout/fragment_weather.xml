@@ -33,7 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fitsSystemWindows="true"
-        android:includeFontPadding="false"
         android:text="13°"
         android:textColor="@color/colorTextPrimary"
         android:textSize="@dimen/cur_temp_text_size"

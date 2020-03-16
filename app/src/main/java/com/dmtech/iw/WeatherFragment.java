@@ -2,6 +2,7 @@ package com.dmtech.iw;
 
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -28,6 +29,8 @@ public class WeatherFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String mName;
+
+    private TextView mCurTempView;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -63,10 +66,14 @@ public class WeatherFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
 
-        TextView curTempView = view.findViewById(R.id.tv_cur_temp);
-        curTempView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+        mCurTempView = view.findViewById(R.id.tv_cur_temp);
+//        mCurTempView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
         TextView updateTimeView = view.findViewById(R.id.tv_update_time);
-        updateTimeView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+//        updateTimeView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+
+        // 自定义字体
+        Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "HelveticaNeue.otf");
+        mCurTempView.setTypeface(typeface);
 
         return view;
     }
