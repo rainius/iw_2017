@@ -47,7 +47,7 @@
         android:layout_marginBottom="16dp"
         android:text="2020-03-15 10:35"
         android:textColor="@color/colorTextPrimary"
-        android:textSize="@dimen/detail_info_text_size"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
