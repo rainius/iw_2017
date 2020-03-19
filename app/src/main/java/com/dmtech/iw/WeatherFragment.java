@@ -66,10 +66,14 @@ public class WeatherFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
 
+
+        View infoContainer = view.findViewById(R.id.info_container);
+        infoContainer.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+
         mCurTempView = view.findViewById(R.id.tv_cur_temp);
-        mCurTempView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
-        TextView updateTimeView = view.findViewById(R.id.tv_update_time);
-        updateTimeView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+//        mCurTempView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+//        TextView updateTimeView = view.findViewById(R.id.tv_update_time);
+//        updateTimeView.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
 
         // 自定义字体
         Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), "HelveticaNeue.otf");
