@@ -1,14 +1,20 @@
 package com.dmtech.iw;
 
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 
@@ -66,11 +72,36 @@ public class WeatherFragment extends Fragment {
                 "HelveticaNeue-UltraLight.otf");
         mCurTempView.setTypeface(typeface);
 
+        ConstraintLayout infoContainer = view.findViewById(R.id.weather_info_container);
+        infoContainer.setPadding(0, 0, 0, getVirtualBarHeight(getActivity()));
+
         return view;
     }
 
     public String getName() {
         return mName;
+    }
+
+    // 获取虚拟按键栏高度
+    private int getVirtualBarHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+        int height = dm.heightPixels;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            display.getRealMetrics(dm);
+        }
+
+        int realHeight = dm.heightPixels;
+        // 计算虚拟按键栏高度
+        int virtualbarHeight = realHeight - height;
+
+        if (virtualbarHeight < 0) {
+            virtualbarHeight = 0;
+        }
+
+        return virtualbarHeight;
     }
 
 }
