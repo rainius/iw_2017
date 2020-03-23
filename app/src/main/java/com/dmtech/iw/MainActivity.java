@@ -20,6 +20,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    // 测试用
+    private static final String[] LOCATION_IDS = {
+            "CN101010800",  // 延庆
+            "CN101131012",  // 伊犁
+            "CN101310304",  // 南沙
+            "US3290097",    // 洛杉矶
+            "AU2147714"     // 悉尼
+    };
+
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -96,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
         String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
         mToolbar.setTitle(title);
         mToolbar.setSubtitle(title);
+
+
+        RequestWeatherTask task = new RequestWeatherTask(LOCATION_IDS);
+        task.execute();
     }
 
     @Override
