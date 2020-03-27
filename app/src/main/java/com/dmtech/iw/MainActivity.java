@@ -16,17 +16,17 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 测试用
     private static final String[] LOCATION_IDS = {
-            "CN101010800",  // 延庆
-            "CN101131012",  // 伊犁
-            "CN101310304",  // 南沙
-            "US3290097",    // 洛杉矶
-            "AU2147714"     // 悉尼
+            "CN101010800",
+            "CN101131012",
+            "CN101310304",
+            "US3290097",
+            "AU2147714"
     };
 
     private Toolbar mToolbar;
@@ -106,8 +106,7 @@ public class MainActivity extends AppCompatActivity {
         mToolbar.setTitle(title);
         mToolbar.setSubtitle(title);
 
-
-        RequestWeatherTask task = new RequestWeatherTask(LOCATION_IDS);
+        RequestWeatherTask task = new RequestWeatherTask(Arrays.asList(LOCATION_IDS));
         task.execute();
     }
 
