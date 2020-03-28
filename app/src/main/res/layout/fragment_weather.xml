@@ -100,7 +100,7 @@
 
         <ImageView
             android:id="@+id/ic_condition"
-            android:layout_width="wrap_content"
+            android:layout_width="32dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:src="@drawable/ic_w104"
