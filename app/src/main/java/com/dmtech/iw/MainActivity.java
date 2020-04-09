@@ -13,13 +13,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.dmtech.iw.entity.HeWeather6;
+import com.dmtech.iw.entity.Weather;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RequestWeatherTask.Callback {
 
     private static final String[] LOCATION_IDS = {
             "CN101010800",
@@ -34,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private ViewPager mViewPager;
     private WeatherPagerAdapter mPagerAdapter;
+
+    private RelativeLayout mLoadingView;
 
     private List<WeatherFragment> mFragments = new ArrayList<>();
 
@@ -60,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageSelected(int position) {
             Log.d("iWeather", "onPageSelected: " + position);
-            mToolbar.setTitle(mFragments.get(position).getName());
-            mToolbar.setSubtitle(mFragments.get(position).getName());
+            updateTitle();
         }
 
         @Override
@@ -89,24 +95,28 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.addDrawerListener(mDrawerToggle);
 
         //填充测试数据，将来删除
-        fillTestFragments();
+        //fillTestFragments();
 
         mViewPager = findViewById(R.id.viewpager);
         mPagerAdapter = new WeatherPagerAdapter(getSupportFragmentManager(), 1);
         mPagerAdapter.setFragments(mFragments);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+
+        mLoadingView = findViewById(R.id.loading_weather_container);
+        mLoadingView.setVisibility(View.GONE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        WeatherFragment f = mFragments.get(mViewPager.getCurrentItem());
-        String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
-        mToolbar.setTitle(title);
-        mToolbar.setSubtitle(title);
+//        WeatherFragment f = mFragments.get(mViewPager.getCurrentItem());
+//        String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
+//        mToolbar.setTitle(title);
+//        mToolbar.setSubtitle(title);
 
         RequestWeatherTask task = new RequestWeatherTask(Arrays.asList(LOCATION_IDS));
+        task.setCallback(this);
         task.execute();
     }
 
@@ -138,5 +148,44 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onPreExecute() {
+        // 开始加载数据，显示等待视图
+        mLoadingView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onPostExecute(List<Weather> weathers) {
+        Log.d("iWeather", "收到天气数据对象：" + weathers.size());
+
+        mFragments.clear();
+        for (int i = 0; i < weathers.size(); i++) {
+            Weather weather = weathers.get(i);
+            WeatherFragment wf = WeatherFragment.newInstance(weather);
+            mFragments.add(wf);
+        }
+
+        // 刷新ViewPager
+        mPagerAdapter.setFragments(mFragments);
+        mPagerAdapter.notifyDataSetChanged();
+
+        // 更新标题文字(主标题：具体位置，副标题：上级区域+国家)
+        updateTitle();
+
+        // 加载完成，隐藏等待视图
+        mLoadingView.setVisibility(View.GONE);
+    }
+
+    private void updateTitle() {
+        // 当前显示哪个页面？
+        int pos = mViewPager.getCurrentItem();
+        WeatherFragment wf = mFragments.get(pos);
+        HeWeather6 hw6 = wf.getWeather().getHeWeather6().get(0);
+        String title = hw6.getBasic().getLocation();
+        String subtitle = hw6.getBasic().getAdmin_area() + ", " + hw6.getBasic().getCnty();
+        mToolbar.setTitle(title);
+        mToolbar.setSubtitle(subtitle);
     }
 }

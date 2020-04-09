@@ -100,8 +100,8 @@
 
         <ImageView
             android:id="@+id/ic_condition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/condition_icon_size"
+            android:layout_height="@dimen/condition_icon_size"
             android:layout_marginBottom="12dp"
             android:src="@drawable/ic_w104"
             app:layout_constraintBottom_toTopOf="@+id/imageView2"

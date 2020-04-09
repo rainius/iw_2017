@@ -3,4 +3,5 @@
     <dimen name="cur_temp_text_size">120sp</dimen>
     <dimen name="info_text_size">20sp</dimen>
     <dimen name="update_time_text_size">14sp</dimen>
+    <dimen name="condition_icon_size">32dp</dimen>
 </resources>

@@ -3,7 +3,9 @@ package com.dmtech.iw;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.dmtech.iw.entity.Weather;
 import com.dmtech.iw.http.HttpHelper;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,16 +17,49 @@ import okhttp3.Response;
 
 public class RequestWeatherTask extends AsyncTask<Void, Void, List<String>> {
 
+    public interface Callback {
+        void onPreExecute();
+        void onPostExecute(List<Weather> weathers);
+    }
+
     private List<String> locations;
+
+    private Callback callback;
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
 
     public RequestWeatherTask(List<String> locations) {
         this.locations = locations;
     }
 
     @Override
+    protected void onPreExecute() {
+        if (callback != null) {
+            callback.onPreExecute();
+        }
+    }
+
+    @Override
     protected void onPostExecute(List<String> results) {
+
+        List<Weather> weathers = new ArrayList<>();
+
         for (String s : results) {
             Log.d("iWeather", "Results: " + s);
+
+            // 转换为Java对象
+            Gson gson = new Gson();
+            Weather w = gson.fromJson(s, Weather.class);
+            Log.d("iWeather",
+                    "天气位置：" + w.getHeWeather6().get(0).getBasic().getLocation());
+
+            weathers.add(w);
+        }
+
+        if (callback != null) {
+            callback.onPostExecute(weathers);
         }
     }
 
