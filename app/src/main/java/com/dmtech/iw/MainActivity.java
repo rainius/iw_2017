@@ -15,11 +15,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.dmtech.iw.entity.Weather;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RequestWeatherTask.Callback {
 
     private static final String[] LOCATION_IDS = {
             "CN101010800",
@@ -60,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageSelected(int position) {
             Log.d("iWeather", "onPageSelected: " + position);
-            mToolbar.setTitle(mFragments.get(position).getName());
-            mToolbar.setSubtitle(mFragments.get(position).getName());
+//            mToolbar.setTitle(mFragments.get(position).getName());
+//            mToolbar.setSubtitle(mFragments.get(position).getName());
         }
 
         @Override
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.addDrawerListener(mDrawerToggle);
 
         //填充测试数据，将来删除
-        fillTestFragments();
+//        fillTestFragments();
 
         mViewPager = findViewById(R.id.viewpager);
         mPagerAdapter = new WeatherPagerAdapter(getSupportFragmentManager(), 1);
@@ -101,12 +103,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        WeatherFragment f = mFragments.get(mViewPager.getCurrentItem());
-        String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
-        mToolbar.setTitle(title);
-        mToolbar.setSubtitle(title);
+//        WeatherFragment f = mFragments.get(mViewPager.getCurrentItem());
+//        String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
+//        mToolbar.setTitle(title);
+//        mToolbar.setSubtitle(title);
 
         RequestWeatherTask task = new RequestWeatherTask(Arrays.asList(LOCATION_IDS));
+        task.setCallback(this);
         task.execute();
     }
 
@@ -138,5 +141,17 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onPostExecute(List<Weather> weathers) {
+        mFragments.clear();
+        for (int i = 0; i < weathers.size(); i++) {
+            Weather w = weathers.get(i);
+            WeatherFragment wf = WeatherFragment.newInstance(w);
+            mFragments.add(wf);
+        }
+        mPagerAdapter.setFragments(mFragments);
+        mPagerAdapter.notifyDataSetChanged();
     }
 }

@@ -3,6 +3,9 @@ package com.dmtech.iw.http;
 public class HttpHelper {
     //https://free-api.heweather.net/s6/weather?location=CN101010800&key=d2ae781d61744d65a2ef2156eef2cb64
     private static final String URL_FORMAT = "https://free-api.heweather.net/s6/weather?location=%s&key=%s";
+
+    private static final String ICON_URL_PREF = "http://jingzbit.cn/iweather/icons/";
+
     private static final String API_KEY = "d2ae781d61744d65a2ef2156eef2cb64";
 
     /**
@@ -13,5 +16,9 @@ public class HttpHelper {
     public static String getUrl(String locationId) {
         String url = String.format(URL_FORMAT, locationId, API_KEY);
         return url;
+    }
+
+    public static String getIconUrl(String conditionCode) {
+        return ICON_URL_PREF + conditionCode + ".png";
     }
 }
