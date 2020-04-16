@@ -13,8 +13,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.dmtech.iw.entity.HeWeather6;
 import com.dmtech.iw.entity.Weather;
 
 import java.util.ArrayList;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
     private ActionBarDrawerToggle mDrawerToggle;
     private ViewPager mViewPager;
     private WeatherPagerAdapter mPagerAdapter;
+    // 等待视图
+    private RelativeLayout mWaitingView;
 
     private List<WeatherFragment> mFragments = new ArrayList<>();
 
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
             Log.d("iWeather", "onPageSelected: " + position);
 //            mToolbar.setTitle(mFragments.get(position).getName());
 //            mToolbar.setSubtitle(mFragments.get(position).getName());
+            updateTitle();
         }
 
         @Override
@@ -98,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
         mPagerAdapter.setFragments(mFragments);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+
+        mWaitingView = findViewById(R.id.waiting_container);
     }
 
     @Override
@@ -143,6 +151,12 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+
+    @Override
+    public void onPreExecute() {
+        mWaitingView.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onPostExecute(List<Weather> weathers) {
         mFragments.clear();
@@ -153,5 +167,21 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
         }
         mPagerAdapter.setFragments(mFragments);
         mPagerAdapter.notifyDataSetChanged();
+
+        // 更新标题和副标题
+        updateTitle();
+
+        mWaitingView.setVisibility(View.GONE);
+    }
+
+    private void updateTitle() {
+        int position = mViewPager.getCurrentItem();
+        WeatherFragment wf = mFragments.get(position);
+        HeWeather6 hw6 = wf.getWeather().getHeWeather6().get(0);
+        String title = hw6.getBasic().getLocation();
+        String subtitle = hw6.getBasic().getCnty() + ", "
+                + hw6.getBasic().getAdmin_area();
+        mToolbar.setTitle(title);
+        mToolbar.setSubtitle(subtitle);
     }
 }

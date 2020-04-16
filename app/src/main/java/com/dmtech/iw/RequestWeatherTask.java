@@ -18,6 +18,7 @@ import okhttp3.Response;
 public class RequestWeatherTask extends AsyncTask<Void, Void, List<String>> {
 
     public interface Callback {
+        void onPreExecute();
         void onPostExecute(List<Weather> weathers);
     }
 
@@ -32,6 +33,14 @@ public class RequestWeatherTask extends AsyncTask<Void, Void, List<String>> {
 
     public void setCallback(Callback callback) {
         this.callback = callback;
+    }
+
+
+    @Override
+    protected void onPreExecute() {
+        if (callback != null) {
+            callback.onPreExecute();
+        }
     }
 
     @Override

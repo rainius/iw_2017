@@ -141,6 +141,10 @@ public class WeatherFragment extends Fragment {
         Glide.with(this)
                 .load(HttpHelper.getIconUrl(hw6.getNow().getCond_code()))
                 .into(mConditionIcon);
+
+        Glide.with(this)
+                .load(HttpHelper.getBackgroundUrl(hw6.getNow().getCond_code()))
+                .into(mBackground);
     }
 
     public String getName() {
@@ -167,6 +171,10 @@ public class WeatherFragment extends Fragment {
         }
 
         return virtualbarHeight;
+    }
+
+    public Weather getWeather() {
+        return mWeather;
     }
 
 }
