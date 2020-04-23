@@ -8,12 +8,16 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MainTheme" parent="Theme.AppCompat.NoActionBar">
+    <!--无Actionbar主题-->
+    <style name="ToolbarTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
+    <!--主页面全屏透明主题-->
+    <style name="MainTheme" parent="ToolbarTheme">
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:statusBarColor">@color/colorPanel</item>
     </style>

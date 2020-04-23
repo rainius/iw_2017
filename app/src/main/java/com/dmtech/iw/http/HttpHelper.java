@@ -5,6 +5,10 @@ public class HttpHelper {
     private static final String URL_FORMAT =
             "https://free-api.heweather.net/s6/weather?location=%s&key=%s&lang=zh";
 
+    // 位置搜索URL模板
+    private static final String SEARCH_LOCATION_URL_FORMAT =
+            "https://search.heweather.net/find?location=%s&key=%s&lang=zh";
+
     private static final String ICON_URL_PREF = "http://jingzbit.cn/iweather/icons/";
 
     private static final String BACKGROUND_URL_PREF = "http://jingzbit.cn/iweather/img/weather_bg/";
@@ -63,5 +67,9 @@ public class HttpHelper {
         }
 
         return BACKGROUND_URL_PREF + name + ".jpg";
+    }
+
+    public static String getSearchLocationUrl(String keyword) {
+        return String.format(SEARCH_LOCATION_URL_FORMAT, keyword, API_KEY);
     }
 }

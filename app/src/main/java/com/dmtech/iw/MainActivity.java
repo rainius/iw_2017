@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -140,6 +141,10 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
         } else if (item.getItemId() == R.id.menu_item_add) {
             Toast.makeText(this, "增加新位置", Toast.LENGTH_SHORT).show();
             Log.d("iWeather", "增加新位置");
+
+            // 启动添加位置页面
+            Intent intent = new Intent(this, SearchAddActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
