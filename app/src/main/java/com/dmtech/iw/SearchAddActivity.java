@@ -8,27 +8,36 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dmtech.iw.entity.Basic;
 import com.dmtech.iw.entity.SearchInfos;
 import com.dmtech.iw.entity.SearchResult;
 import com.dmtech.iw.http.HttpHelper;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SearchAddActivity extends AppCompatActivity implements View.OnClickListener {
+public class SearchAddActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     private EditText mKeywordEdit;  // 搜索框
     private TextView mCancelBtn;    // 退出按钮
+
     private ListView mLocationList; // 待选地址列表
+    private ArrayAdapter mAdapter;
+
+    private List<String> mLocationLabels;   // 位置名称列表
 
     private Handler mHandler = new Handler();
     private Runnable mStartSearch = new Runnable() {
@@ -73,7 +82,13 @@ public class SearchAddActivity extends AppCompatActivity implements View.OnClick
         mCancelBtn = findViewById(R.id.btn_cancel);
         mCancelBtn.setOnClickListener(this);
 
+        // 搜索结果列表、适配器及内容关联
         mLocationList = findViewById(R.id.listview);
+        mLocationLabels = new ArrayList<>();
+        mAdapter = new ArrayAdapter(this,
+                android.R.layout.simple_list_item_1, mLocationLabels);
+        mLocationList.setAdapter(mAdapter);
+        mLocationList.setOnItemClickListener(this);
     }
 
     @Override
@@ -83,6 +98,11 @@ public class SearchAddActivity extends AppCompatActivity implements View.OnClick
                 finish();
                 break;
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d("iWeather", "onItemClick: " + mLocationLabels.get(position));
     }
 
     // 根据搜索框中输入的文字查询匹配的位置
@@ -124,9 +144,13 @@ public class SearchAddActivity extends AppCompatActivity implements View.OnClick
 
         @Override
         protected void onPostExecute(String s) {
+
+            mLocationLabels.clear();
+
             Log.d("iWeather", "result: " + s);
             // JSON -> Java Bean
             if (TextUtils.isEmpty(s)) {
+                mAdapter.notifyDataSetChanged();
                 return;
             }
 
@@ -135,7 +159,15 @@ public class SearchAddActivity extends AppCompatActivity implements View.OnClick
             SearchInfos searchInfos = searchResult.getInfos().get(0);
             if ("ok".equalsIgnoreCase(searchInfos.getStatus())) {   //能够查询到结果才处理
                 Log.d("iWeather", "search results: " + searchInfos.getBasics().size());
+                // 为搜索结果分别生成显示标签
+                for (Basic b : searchInfos.getBasics()) {
+                    String label = b.getLocation() + ", " + b.getAdmin_area() + ", " + b.getCnty();
+                    mLocationLabels.add(label);
+                }
             }
+
+            // 通知列表更新
+            mAdapter.notifyDataSetChanged();
         }
     }
 }
