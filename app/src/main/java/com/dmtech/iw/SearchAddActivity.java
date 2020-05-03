@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dmtech.iw.entity.Basic;
 import com.dmtech.iw.entity.SearchInfos;
@@ -29,12 +30,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SearchAddActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class SearchAddActivity extends AppCompatActivity
+        implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     private EditText mKeywordEdit;  // 搜索框
     private TextView mCancelBtn;    // 退出按钮
 
-    private ListView mLocationList; // 待选地址列表
+    private ListView mLocationList; //待选地 址列表
     private ArrayAdapter mAdapter;
 
     private List<String> mLocationLabels;   // 位置名称列表
@@ -103,6 +105,7 @@ public class SearchAddActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d("iWeather", "onItemClick: " + mLocationLabels.get(position));
+        Toast.makeText(this, mLocationLabels.get(position), Toast.LENGTH_SHORT).show();
     }
 
     // 根据搜索框中输入的文字查询匹配的位置
