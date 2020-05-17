@@ -19,13 +19,19 @@ import com.dmtech.iw.entity.Basic;
 import com.dmtech.iw.entity.SearchInfos;
 import com.dmtech.iw.entity.SearchResult;
 import com.dmtech.iw.http.HttpHelper;
+import com.dmtech.iw.model.DaoSession;
+import com.dmtech.iw.model.LocationModel;
+import com.dmtech.iw.model.LocationModelDao;
 import com.google.gson.Gson;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import event.MessageEvent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -40,6 +46,7 @@ public class SearchAddActivity extends AppCompatActivity
     private ArrayAdapter mAdapter;
 
     private List<String> mLocationLabels;   // 位置名称列表
+    private List<Basic> mLocations;         // 位置对象列表
 
     private Handler mHandler = new Handler();
     private Runnable mStartSearch = new Runnable() {
@@ -87,6 +94,8 @@ public class SearchAddActivity extends AppCompatActivity
         // 搜索结果列表、适配器及内容关联
         mLocationList = findViewById(R.id.listview);
         mLocationLabels = new ArrayList<>();
+        mLocations = new ArrayList<>();
+
         mAdapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_1, mLocationLabels);
         mLocationList.setAdapter(mAdapter);
@@ -105,7 +114,38 @@ public class SearchAddActivity extends AppCompatActivity
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d("iWeather", "onItemClick: " + mLocationLabels.get(position));
-        Toast.makeText(this, mLocationLabels.get(position), Toast.LENGTH_SHORT).show();
+        Basic location = mLocations.get(position);
+        //将location对象转换为LocationModel对象以存储到数据库
+        LocationModel model = LocationModel.fromBasic(location);
+        Toast.makeText(this, model.getCid() + ":" + model.getLocation(), Toast.LENGTH_SHORT).show();
+        // 保存model到数据库
+        SaveLocationTask saveTask = new SaveLocationTask(model);
+        saveTask.execute();
+    }
+
+    // 异步保存到数据库
+    private class SaveLocationTask extends AsyncTask<Void, Void, LocationModel> {
+
+        private LocationModel locationModel;
+
+        public SaveLocationTask(LocationModel locationModel) {
+            this.locationModel = locationModel;
+        }
+
+        @Override
+        protected LocationModel doInBackground(Void... voids) {
+            DaoSession session = ((iWeatherApp) getApplication()).getDaoSession();
+            LocationModelDao dao = session.getLocationModelDao();
+            dao.insert(locationModel);
+            Log.d("iWeather", "Insert location: " + locationModel.getId());
+            return locationModel;
+        }
+
+        @Override
+        protected void onPostExecute(LocationModel locationModel) {
+            EventBus.getDefault().post(new MessageEvent());
+            finish();
+        }
     }
 
     // 根据搜索框中输入的文字查询匹配的位置
@@ -147,8 +187,9 @@ public class SearchAddActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String s) {
-
+            // 清空旧数据
             mLocationLabels.clear();
+            mLocations.clear();
 
             Log.d("iWeather", "result: " + s);
             // JSON -> Java Bean
@@ -166,6 +207,7 @@ public class SearchAddActivity extends AppCompatActivity
                 for (Basic b : searchInfos.getBasics()) {
                     String label = b.getLocation() + ", " + b.getAdmin_area() + ", " + b.getCnty();
                     mLocationLabels.add(label);
+                    mLocations.add(b);
                 }
             }
 
@@ -173,4 +215,5 @@ public class SearchAddActivity extends AppCompatActivity
             mAdapter.notifyDataSetChanged();
         }
     }
+
 }

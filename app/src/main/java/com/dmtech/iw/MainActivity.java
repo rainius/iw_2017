@@ -7,9 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
+import event.MessageEvent;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +22,12 @@ import android.widget.Toast;
 
 import com.dmtech.iw.entity.HeWeather6;
 import com.dmtech.iw.entity.Weather;
+import com.dmtech.iw.model.DaoSession;
+import com.dmtech.iw.model.LocationModel;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,13 +35,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RequestWeatherTask.Callback {
 
-    private static final String[] LOCATION_IDS = {
-            "CN101010800",
-            "CN101131012",
-            "CN101310304",
-            "US3290097",
-            "AU2147714"
-    };
+//    private static final String[] LOCATION_IDS = {
+//            "CN101010800",
+//            "CN101131012",
+//            "CN101310304",
+//            "US3290097",
+//            "AU2147714"
+//    };
+    // 天气位置ID列表
+    private List<String> mLocationIds = new ArrayList<>();
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
@@ -107,17 +117,25 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         mWaitingView = findViewById(R.id.waiting_container);
+
+        // 注册本activity为消息订阅者
+        EventBus.getDefault().register(this);
+
+        LoadLocationsTask loadLocationsTask = new LoadLocationsTask();
+        loadLocationsTask.execute();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        WeatherFragment f = mFragments.get(mViewPager.getCurrentItem());
-//        String title = f.getArguments().getString(WeatherFragment.ARG_NAME);
-//        mToolbar.setTitle(title);
-//        mToolbar.setSubtitle(title);
+//        RequestWeatherTask task = new RequestWeatherTask(Arrays.asList(LOCATION_IDS));
+//        task.setCallback(this);
+//        task.execute();
+    }
 
-        RequestWeatherTask task = new RequestWeatherTask(Arrays.asList(LOCATION_IDS));
+    // 请求天气数据
+    private void requestWeather(List<String> locationsIds) {
+        RequestWeatherTask task = new RequestWeatherTask(locationsIds);
         task.setCallback(this);
         task.execute();
     }
@@ -126,6 +144,13 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // 注销消息订阅者
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override
@@ -180,6 +205,10 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
     }
 
     private void updateTitle() {
+        if (mFragments.size() <= 0) {
+            return;
+        }
+
         int position = mViewPager.getCurrentItem();
         WeatherFragment wf = mFragments.get(position);
         HeWeather6 hw6 = wf.getWeather().getHeWeather6().get(0);
@@ -188,5 +217,41 @@ public class MainActivity extends AppCompatActivity implements RequestWeatherTas
                 + hw6.getBasic().getAdmin_area();
         mToolbar.setTitle(title);
         mToolbar.setSubtitle(subtitle);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        Toast.makeText(this, "Locations updated", Toast.LENGTH_SHORT).show();
+        // 从数据库加载天气位置列表
+        LoadLocationsTask loadLocationsTask = new LoadLocationsTask();
+        loadLocationsTask.execute();
+    }
+
+    // 从数据库加载位置
+    private class LoadLocationsTask extends AsyncTask<Void, Void, List<String>> {
+
+        @Override
+        protected List<String> doInBackground(Void... voids) {
+            // 将数据库中记录全部读出为model列表
+            DaoSession session = ((iWeatherApp) getApplication()).getDaoSession();
+            List<LocationModel> models = session.getLocationModelDao().loadAll();
+            // 生成位置ID列表
+            List<String> locIds = new ArrayList<>();
+            if (models != null) {
+                for (LocationModel model : models) {
+                    locIds.add(model.getCid());
+                }
+            }
+
+            Log.d("iWeather", "Load locations: " + locIds.size());
+
+            return locIds;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> locationIds) {
+            // 根据查询到的location id重新取得天气数据
+            requestWeather(locationIds);
+        }
     }
 }
